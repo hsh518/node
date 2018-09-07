@@ -1,5 +1,6 @@
 exports.addUser = function(req, res) {
-	res.end('添加用户')
+	let backValue = JSON.stringify(req.body)
+	res.end(backValue)
 }
 exports.deleteUser = function(req, res) {
 	res.end('删除用户')
