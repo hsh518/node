@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Chat Example</title>
+    <link rel="stylesheet" type="text/css" href="./index.css">
+    <script type="text/javascript" src="./webscoket.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            createdWs()
+        }
+    </script>
+</head>
+<body>
+    <div id="log">
+        <p class="title" id="toUser"></p>
+        <ul class="aside">
+            <li GroupId='1'>ws交流群</li>
+        </ul>
+        <div id="chatLog"></div>
+    </div>
+    <form id="form">
+        <input type="button" value="Send" id="btn"  />
+        <input type="text" id="msg" size="64"/>
+    </form>
+    <div class="user_list">
+        <div class="group" id="group">群成员</div>
+        <ul>
+            <li class="chat" UserId="1" name="用户1">用户1<li>
+            <li class="chat" UserId="2" name="用户2">用户2<li>
+            <li class="chat" UserId="3" name="用户3">用户3<li>
+        </ul>    
+    </div>
+    
+</body>
+</html>
+<script type="text/javascript">
+    let OtoUser = document.getElementById("toUser")  
+    let OchatLog = document.getElementById('chatLog')
+    let OuserList = document.getElementsByClassName('user_list')[0]
+    let Ochats = OuserList.getElementsByClassName("chat")
+    let Ogroup = document.getElementById("group")
+    let Oaside = document.getElementsByClassName('aside')[0]
+    let OasideItem = document.getElementsByTagName('li')
+    sessionStorage.setItem("type","group")
+    sessionStorage.setItem("TOID","")
+    // 为所有成员绑定事件
+    for (let i = 0; i <Ochats.length; i++) {
+        if(sessionStorage.getItem("USERID") === Ochats[i].getAttribute("UserId")){
+            Ochats[i].style.color = 'red'
+            Ochats[i].onclick = function() {
+                alert('不支持与自己对话')
+            }
+            continue
+        }
+        // 群成员点击事件
+        Ochats[i].onclick = function(){
+            Oaside.style.display = 'block'
+            OuserList.style.display = 'none'
+            if(this.getAttribute("choose") == 1) {
+                asideChoose(this)
+                return false 
+            }
+            toUserText(this.getAttribute("name"))
+            this.setAttribute('choose',1)
+            OchatLog.style.marginLeft='200px'
+            let cloneLi = this.cloneNode(true)
+            let Cspan = document.createElement('span')
+            Cspan.innerText = 'X'
+            cloneLi.appendChild(Cspan)
+            resetStyle(OasideItem, 'background', '#fff')
+            cloneLi.style.background = '#ddd' 
+            Oaside.appendChild(cloneLi)
+            sessionStorage.setItem("type","one")
+            sessionStorage.setItem("ToId",this.getAttribute("UserId"))
+        }
+    }
+    Oaside.onclick=function(e){
+        if(!e.target) {
+            return false
+        }
+        if(e.target.tagName === 'SPAN') {
+            let Rli = e.target.parentNode
+            resetChoose(Rli)
+            if(Rli.getAttribute("UserId") === sessionStorage.getItem("ToId")) {
+                sessionStorage.setItem("type","group")
+                OuserList.style.display = 'block'
+                toUserText('ws交流群')
+                OasideItem[0].style.background = '#ccc'
+            }
+            Oaside.removeChild(Rli)
+            return false
+        }
+        let Oli = e.target
+        toUserText(Oli.getAttribute("name"))
+        resetStyle(OasideItem, 'background', '#fff')
+        Oli.style.background = '#ddd' 
+        if(Oli.getAttribute('GroupId')){
+            toUserText('ws交流群')
+            sessionStorage.setItem("type","group")
+            OuserList.style.display = 'block'
+        } else{
+            OuserList.style.display = 'none'
+            sessionStorage.setItem("type","one")
+            sessionStorage.setItem("ToId",this.getAttribute("UserId"))
+        }
+    }
+    // 重置样式
+    function removeStyle(){
+        for (let i = 0; i <3; i++) {
+            if(sessionStorage.getItem("USERID") === Ochats[i].getAttribute("UserId")){
+            Ochats[i].style.color = 'red'
+            continue
+        }
+            Ochats[i].style.color = '#000'
+        }
+        Ogroup.style.color = '#000'
+    }
+    // 重置节点样式
+    function resetStyle(nodes,key,value){
+        for (let i = 0; i < nodes.length; i++) {
+            nodes[i].style[key] = value
+        }
+    }
+    // 重置用户列表可选
+    function resetChoose(node){
+        for (let i = 0; i < Ochats.length; i++) {
+            if(Ochats[i].getAttribute("UserId") === node.getAttribute("UserId")){
+                Ochats[i].setAttribute("choose", 0)
+                break
+            }
+        }
+    }
+    // 选择侧边已存在用户处理
+    function asideChoose(node){
+        for(let i=1;i< OasideItem.length; i++) {
+            if(OasideItem[i].getAttribute("UserId") === node.getAttribute("UserId")){
+                resetStyle(OasideItem, 'background', '#fff')
+                OasideItem[i].style.background = '#ddd'
+                sessionStorage.setItem("type","one")
+                sessionStorage.setItem("ToId",OasideItem[i].getAttribute("UserId"))
+                break
+            }
+        }
+    }
+    //重置对应用户
+    function toUserText(text) {
+        OtoUser.innerText = text
+    }
+    toUserText('ws交流群')
+</script>

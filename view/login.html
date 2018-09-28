@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>登陆</title>
+	<meta charset="utf-8">
+</head>
+<body>
+	<form>
+		<label>
+			<span>userName：</span>
+			<input id="userName" type="" name="">
+		</label>
+		<br>
+		<label>
+			<span>passWord：</span>
+			<input id="passWord" type="" name="">
+		</label>
+		<br>
+		<button type="button" id="btn">确认</button>
+	</form>
+</body>
+</html>
+<script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+	$('#btn').click(() => {
+		let data = {
+			userName: $('#userName').val(),
+			passWord: $('#passWord').val()
+		}
+		console.log(data)
+		$.post('/user/login',data,(res) => {
+			if(res.code === 0) {
+				console.log('scussce')
+				sessionStorage.setItem("userName", res.data.userName)
+				sessionStorage.setItem("userId", res.data.userId)
+				window.location.href = '/play'
+			}
+		}, 'json')
+	})
+</script>

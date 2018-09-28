@@ -1,6 +1,7 @@
 /**
 * 路由配置
 */
+const fs = require('fs')
 let url = require('url')
 let querystring = require('querystring')
 let routes =require('./router/routes')
@@ -15,6 +16,12 @@ module.exports = router
 */
 function pathHandOut(req, res) {
 	let pathName = url.parse(req.url).pathname; 
+	console.log(pathName);
+	if(pathName.split('/')[1] === 'assets') {
+		console.log('获取文件')
+		getAssets(pathName,res)
+		return false
+	}
 	let noMethod = true
 	let reqPath = routes[req.method.toLowerCase()][pathName]
 	let stack = routes.all['/']
@@ -47,4 +54,21 @@ function middleware(req, res, stack) {
 		}
 	}
 	next()
+}
+
+/**
+ * 静态文件获取
+ * @return {[type]} [description]
+ */
+function getAssets(path,res) {
+	let type = path.split('.')[1]
+	path = '.' + path
+	fs.readFile(path, (error, data) => {
+		if(error) {
+			return false
+		} else {
+			res.writeHead(200,{'Content-type':"text/"+type})
+			res.end(data)
+		}
+	});
 }
